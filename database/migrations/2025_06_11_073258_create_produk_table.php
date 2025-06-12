@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('rating', 2, 1);
             $table->bigInteger('price');
             $table->text('description');
-            $table->string('images');
+            $table->string('images')->nullable();
             $table->timestamps();
         });
     }

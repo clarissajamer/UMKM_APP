@@ -2,117 +2,215 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\kategori;
 use App\Models\produk;
+use App\Models\umkm;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
 
 class ProdukController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
         $data = produk::with('kategori', 'umkm')->get();
-        return response()->json($data);
-    }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|max:100',
-            'id_kategori' => 'required|exists:kategori,id',
-            'id_umkm' => 'required|exists:umkm,id',
-            'rating' => 'required|numeric|between:0,5',
-            'price' => 'required|numeric',
-            'description' => 'required|max:255',
-            'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        if ($request->hasFile('images')) {
-            $file = $request->file('images');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename); // simpan di public/uploads
-            $validated['images'] = 'uploads/' . $filename;  // simpan path relatif
+        if ($request->expectsJson()) {
+            return response()->json($data);
         }
 
-        $data = produk::create($validated);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Data Berhasil Ditambahkan',
-            'data' => $data
-        ]);
-    }
-
-    public function show(string $id)
-    {
-        $data = produk::with('kategori', 'umkm')->find($id);
-        if (!$data) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Produk tidak ditemukan',
-            ], 404);
-        }
-        return response()->json([
-            'status' => true,
-            'data' => $data
-        ], 200);
+        return view('produk.index', ['produk' => $data]);
     }
     
-    public function update(Request $request, string $id)
-    {
-        $data = produk::findOrFail($id);
+    public function create() {
+        $kategori = kategori::all();
+        $umkm = umkm::all();
+        return view('produk.form', compact('kategori', 'umkm'));  
+    }   
 
+    public function store(Request $request) {
         $validated = $request->validate([
-            'title' => 'required|max:100',
             'id_kategori' => 'required|exists:kategori,id',
             'id_umkm' => 'required|exists:umkm,id',
+            'title' => 'required|Max:100',
             'rating' => 'required|numeric|between:0,5',
             'price' => 'required|numeric',
-            'description' => 'required|max:255',
-            'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'description' => 'required|Max:255',
+            'images' => 'required|mimes:jpeg,png|max:2048',
         ]);
 
-        if ($request->hasFile('images')) {
-            // Hapus images lama jika ada
-            if ($data->images && file_exists(public_path($data->images))) {
-                unlink(public_path($data->images));
-            }
+        $status = \App\Models\produk::create($validated);
 
-            $file = $request->file('images');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename);
-            $validated['images'] = 'uploads/' . $filename;
-        }
-
-        $data->update($validated);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Update berhasil',
-            'data' => $data
-        ], 200);
-    }
-
-    public function destroy(string $id)
-    {
-        $data = produk::find($id);
-        if (!$data) {
+        if ($request->expectsJson()) {
             return response()->json([
-                'status' => false,
-                'message' => 'Produk tidak ditemukan',
-            ], 404);
+                'status' => $status ? true : false,
+                'message' => $status ? 'Berhasil ditambah' : 'Gagal ditambah',
+            ], $status ? 200 : 500);
         }
 
-        // Hapus file gambar
-        if ($data->images && file_exists(public_path($data->images))) {
-            unlink(public_path($data->images));
-        }
-
-        $data->delete();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Update berhasil',
-        ], 200);
+        if($status) return redirect('produk')->with('success', 'Data berhasil ditambahkan');
+        else return redirect('produk')->with('error', 'Data gagal ditambahkan');
     }
+
+    public function edit($id) {
+        $data['result'] = \App\Models\produk::where('id', $id)->first();
+        return view('produk.form')->with($data);
+    }
+    
+    public function update(Request $request, $id) {
+        $validated = $request->validate([
+            'id_kategori' => 'required|exists:kategori,id',
+            'id_umkm' => 'required|exists:umkm,id',
+            'title' => 'required|Max:100',
+            'rating' => 'required|numeric|between:0,5',
+            'price' => 'required|numeric',
+            'description' => 'required|Max:255',
+            'images' => 'required|mimes:jpeg,png|max:2048',
+        ]);
+
+        $produk = \App\Models\produk::where('id', $id)->first();
+
+        if ($request->hasFile('gambar') && $request->file('gambar')->isValid()) {
+            $filename = $produk->id_produk . "." . $request->file('gambar')->getClientOriginalExtension();
+            $request->file('gambar')->storeAs('uploads', $filename, 'upload');
+            $validated['gambar'] = $filename;
+        }
+
+        $status = $produk->update($validated);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => $status ? true : false,
+                'message' => $status ? 'Update berhasil' : 'Update gagal',
+            ], $status ? 200 : 500);
+        }
+
+        if($produk) return redirect('produk')->with('success', 'Data berhasil diubah');
+        else return redirect('produk')->with('error', 'Data gagal diubah');
+    }
+
+    public function destroy(Request $request, $id) {
+        $result = \App\Models\produk::Where('id', $id)->first();
+        $status = $result->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => $status ? true : false,
+                'message' => $status ? 'Update berhasil' : 'Update gagal',
+            ], $status ? 200 : 500);
+        }
+
+        if($status) return redirect('produk')->with('success', 'Data Berhasil dihapus');
+        else return redirect('produk')->with('error', 'Data Gagal dihapus');
+    }
+
+    // alur online first
+
+    // public function index()
+    // {
+    //     $data = produk::with('kategori', 'umkm')->get();
+    //     return response()->json($data);
+    // }
+
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'title' => 'required|max:100',
+    //         'id_kategori' => 'required|exists:kategori,id',
+    //         'id_umkm' => 'required|exists:umkm,id',
+    //         'rating' => 'required|numeric|between:0,5',
+    //         'price' => 'required|numeric',
+    //         'description' => 'required|max:255',
+    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    //     ]);
+
+    //     if ($request->hasFile('images')) {
+    //         $file = $request->file('images');
+    //         $filename = time() . '_' . $file->getClientOriginalName();
+    //         $file->move(public_path('uploads'), $filename); // simpan di public/uploads
+    //         $validated['images'] = 'uploads/' . $filename;  // simpan path relatif
+    //     }
+
+    //     $data = produk::create($validated);
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Data Berhasil Ditambahkan',
+    //         'data' => $data
+    //     ]);
+    // }
+
+    // public function show(string $id)
+    // {
+    //     $data = produk::with('kategori', 'umkm')->find($id);
+    //     if (!$data) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Produk tidak ditemukan',
+    //         ], 404);
+    //     }
+    //     return response()->json([
+    //         'status' => true,
+    //         'data' => $data
+    //     ], 200);
+    // }
+    
+    // public function update(Request $request, string $id)
+    // {
+    //     $data = produk::findOrFail($id);
+
+    //     $validated = $request->validate([
+    //         'title' => 'required|max:100',
+    //         'id_kategori' => 'required|exists:kategori,id',
+    //         'id_umkm' => 'required|exists:umkm,id',
+    //         'rating' => 'required|numeric|between:0,5',
+    //         'price' => 'required|numeric',
+    //         'description' => 'required|max:255',
+    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    //     ]);
+
+    //     if ($request->hasFile('images')) {
+    //         // Hapus images lama jika ada
+    //         if ($data->images && file_exists(public_path($data->images))) {
+    //             unlink(public_path($data->images));
+    //         }
+
+    //         $file = $request->file('images');
+    //         $filename = time() . '_' . $file->getClientOriginalName();
+    //         $file->move(public_path('uploads'), $filename);
+    //         $validated['images'] = 'uploads/' . $filename;
+    //     }
+
+    //     $data->update($validated);
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Update berhasil',
+    //         'data' => $data
+    //     ], 200);
+    // }
+
+    // public function destroy(string $id)
+    // {
+    //     $data = produk::find($id);
+    //     if (!$data) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Produk tidak ditemukan',
+    //         ], 404);
+    //     }
+
+    //     // Hapus file gambar
+    //     if ($data->images && file_exists(public_path($data->images))) {
+    //         unlink(public_path($data->images));
+    //     }
+
+    //     $data->delete();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Update berhasil',
+    //     ], 200);
+    // }
 }
