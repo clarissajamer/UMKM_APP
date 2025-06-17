@@ -7,7 +7,7 @@ use App\Models\produk;
 use App\Models\umkm;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
-
+use PhpParser\Builder\Function_;
 
 class ProdukController extends Controller
 {
@@ -21,6 +21,12 @@ class ProdukController extends Controller
         }
 
         return view('produk.index', ['produk' => $data]);
+    }
+
+    public function show($id)
+    {
+        $produk = produk::with(['kategori', 'umkm'])->findOrFail($id);
+        return view('produk.detail', compact('produk'));
     }
     
     public function create() {
@@ -36,9 +42,16 @@ class ProdukController extends Controller
             'title' => 'required|Max:100',
             'rating' => 'required|numeric|between:0,5',
             'price' => 'required|numeric',
-            'description' => 'required|Max:255',
+            'description' => 'required ',
             'images' => 'required|mimes:jpeg,png|max:2048',
         ]);
+
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $validated['images'] = $filename;
+        }
 
         $status = \App\Models\produk::create($validated);
 
@@ -67,14 +80,15 @@ class ProdukController extends Controller
             'price' => 'required|numeric',
             'description' => 'required|Max:255',
             'images' => 'required|mimes:jpeg,png|max:2048',
-        ]);
+        ]);  
 
         $produk = \App\Models\produk::where('id', $id)->first();
 
-        if ($request->hasFile('gambar') && $request->file('gambar')->isValid()) {
-            $filename = $produk->id_produk . "." . $request->file('gambar')->getClientOriginalExtension();
-            $request->file('gambar')->storeAs('uploads', $filename, 'upload');
-            $validated['gambar'] = $filename;
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $validated['images'] = $filename;
         }
 
         $status = $produk->update($validated);
@@ -105,112 +119,4 @@ class ProdukController extends Controller
         else return redirect('produk')->with('error', 'Data Gagal dihapus');
     }
 
-    // alur online first
-
-    // public function index()
-    // {
-    //     $data = produk::with('kategori', 'umkm')->get();
-    //     return response()->json($data);
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'title' => 'required|max:100',
-    //         'id_kategori' => 'required|exists:kategori,id',
-    //         'id_umkm' => 'required|exists:umkm,id',
-    //         'rating' => 'required|numeric|between:0,5',
-    //         'price' => 'required|numeric',
-    //         'description' => 'required|max:255',
-    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    //     ]);
-
-    //     if ($request->hasFile('images')) {
-    //         $file = $request->file('images');
-    //         $filename = time() . '_' . $file->getClientOriginalName();
-    //         $file->move(public_path('uploads'), $filename); // simpan di public/uploads
-    //         $validated['images'] = 'uploads/' . $filename;  // simpan path relatif
-    //     }
-
-    //     $data = produk::create($validated);
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Data Berhasil Ditambahkan',
-    //         'data' => $data
-    //     ]);
-    // }
-
-    // public function show(string $id)
-    // {
-    //     $data = produk::with('kategori', 'umkm')->find($id);
-    //     if (!$data) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Produk tidak ditemukan',
-    //         ], 404);
-    //     }
-    //     return response()->json([
-    //         'status' => true,
-    //         'data' => $data
-    //     ], 200);
-    // }
-    
-    // public function update(Request $request, string $id)
-    // {
-    //     $data = produk::findOrFail($id);
-
-    //     $validated = $request->validate([
-    //         'title' => 'required|max:100',
-    //         'id_kategori' => 'required|exists:kategori,id',
-    //         'id_umkm' => 'required|exists:umkm,id',
-    //         'rating' => 'required|numeric|between:0,5',
-    //         'price' => 'required|numeric',
-    //         'description' => 'required|max:255',
-    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    //     ]);
-
-    //     if ($request->hasFile('images')) {
-    //         // Hapus images lama jika ada
-    //         if ($data->images && file_exists(public_path($data->images))) {
-    //             unlink(public_path($data->images));
-    //         }
-
-    //         $file = $request->file('images');
-    //         $filename = time() . '_' . $file->getClientOriginalName();
-    //         $file->move(public_path('uploads'), $filename);
-    //         $validated['images'] = 'uploads/' . $filename;
-    //     }
-
-    //     $data->update($validated);
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Update berhasil',
-    //         'data' => $data
-    //     ], 200);
-    // }
-
-    // public function destroy(string $id)
-    // {
-    //     $data = produk::find($id);
-    //     if (!$data) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Produk tidak ditemukan',
-    //         ], 404);
-    //     }
-
-    //     // Hapus file gambar
-    //     if ($data->images && file_exists(public_path($data->images))) {
-    //         unlink(public_path($data->images));
-    //     }
-
-    //     $data->delete();
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Update berhasil',
-    //     ], 200);
-    // }
 }

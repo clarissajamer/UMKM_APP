@@ -9,9 +9,12 @@ Route::get('/', function () {
     return redirect('/produk');
 });
 
+
+
 // route produk
 
 Route::get('/produk', [ProdukController::class, 'index']);
+Route::get('produk/{id}/detail', [ProdukController::class, 'show']);
 
 Route::get('produk/add', [ProdukController::class, 'create']);
 Route::post('produk', [ProdukController::class, 'store']);
@@ -36,6 +39,7 @@ Route::delete('kategori/{id}/delete', [KategoriController::class, 'destroy']);
 // route umkm
 
 Route::get('/umkm', [umkmController::class, 'index']);
+Route::get('umkm/{id}/detail', [umkmController::class, 'show']);
 
 Route::get('umkm/add', [umkmController::class, 'create']);
 Route::post('umkm', [umkmController::class, 'store']);

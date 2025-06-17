@@ -4,10 +4,10 @@
  <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-          Produk menu
+          umkm
         </h1>
         <ol class="breadcrumb">
-          <li><a href="{{ url('/produk') }}"><i class="fa fa-dashboard"></i> Home</a></li>
+          <li><a href="{{ url('/umkm') }}"><i class="fa fa-dashboard"></i> Home</a></li>
         </ol>
       </section>
   
@@ -17,12 +17,12 @@
         <!-- Default box -->
         <div class="box">
           <div class="box-header with-border">
-            <span class="box-title">{{ $produk->title }}</span>
+            <span class="box-title">{{ $umkm->umkm_name }}</span>
           <div class="box-body">
             <div class="row">
                 <div class="col-md-4 text-center">
-                    @if ($produk->images)
-                        <img src="{{ asset('uploads/' . $produk->images) }}" class="img-thumbnail" width="250">
+                    @if ($umkm->images)
+                        <img src="{{ asset('uploads/' . $umkm->images) }}" class="img-thumbnail" width="250">
                     @else
                         <img src="{{ asset('images/no-image.png') }}" class="img-thumbnail" width="250">
                     @endif
@@ -30,24 +30,24 @@
                 <div class="col-md-8">
                     <table class="table table-stripped">
                         <tr>
-                            <th>Kategori</th>
-                            <td>{{ $produk->kategori->category ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th>Nama UMKM</th>
-                            <td>{{ $produk->umkm->umkm_name ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th>Rating</th>
-                            <td>{{ $produk->rating ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <th>Harga</th>
-                            <td>{{ number_format($produk->price, 0, ',', '.') }}</td>
+                            <th>Owner UMKM</th>
+                            <td>{{ $umkm->owner_name ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th>Deskripsi</th>
-                            <td>{{ $produk->description ?? '-' }}</td>
+                            <td>{{ $umkm->umkm_desc ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>NO Telp</th>
+                            <td>{{ $umkm->phone ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ $umkm->email ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Alamat</th>
+                            <td>{{ $umkm->address ?? '-' }}</td>
                         </tr>
                     </table>
                 </div>
@@ -56,7 +56,7 @@
           <!-- /.box-body -->
           <!-- /.box-footer-->
             <div class="box-footer">
-                <a href="{{ url('produk') }}" class="btn bg-purple"><i class="fa fa-chevron-left"></i>Kembali</a>
+                <a href="{{ url('umkm') }}" class="btn bg-purple"><i class="fa fa-chevron-left"></i>Kembali</a>
             </div>
         </div>
         <!-- /.box -->

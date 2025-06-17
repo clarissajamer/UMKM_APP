@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\CorsAllMiddleware;
+use App\Http\Middleware\HandleCors;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;

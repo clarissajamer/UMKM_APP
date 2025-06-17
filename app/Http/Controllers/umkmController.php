@@ -19,6 +19,12 @@ class umkmController extends Controller
 
         return view('umkm/index')->with($data);
     }
+
+    public function show($id)
+    {
+        $umkm = umkm::find($id);
+        return view('umkm.detail', compact('umkm'));
+    }
     
     public function create() {
         return view('umkm/form');  
@@ -28,12 +34,19 @@ class umkmController extends Controller
         $validated = $request->validate([
             'umkm_name' => 'required|max:100',
             'owner_name' => 'required|max:100',
-            'umkm_desc' => 'required|max:255',
+            'umkm_desc' => 'required',
             'phone' => 'required|digits_between:10,15',
             'email' => 'required|email|max:50|unique:umkm,email',
-            'address' => 'required|max:255',
+            'address' => 'required',
             'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $validated['images'] = $filename;
+        }
 
         $status = \App\Models\umkm::create($validated);
 
@@ -57,7 +70,7 @@ class umkmController extends Controller
         $validated = $request->validate([
             'umkm_name' => 'required|max:100',
             'owner_name' => 'required|max:100',
-            'umkm_desc' => 'required|max:255',
+            'umkm_desc' => 'required',
             'phone' => 'required|digits_between:10,15',
             'email' => [
                 'required',
@@ -65,16 +78,17 @@ class umkmController extends Controller
                 'max:50',
                 Rule::unique('umkm', 'email')->ignore($id),
             ],
-            'address' => 'required|max:255',
+            'address' => 'required',
             'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $umkm = \App\Models\umkm::where('id', $id)->first();
 
-        if ($request->hasFile('gambar') && $request->file('gambar')->isValid()) {
-            $filename = $umkm->id_umkm . "." . $request->file('gambar')->getClientOriginalExtension();
-            $request->file('gambar')->storeAs('uploads', $filename, 'upload');
-            $validated['gambar'] = $filename;
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $validated['images'] = $filename;
         }
 
         $status = $umkm->update($validated);

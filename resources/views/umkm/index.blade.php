@@ -19,6 +19,16 @@
           <div class="box-header with-border">
             <a href="{{ url('umkm/add') }}" class="btn btn-success"><i class="fa fa-plus-circle"></i>Tambah</a>
           <div class="box-body">
+            <div class="row" style="margin-bottom: 10px;">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" id="searchBtn"><i class="fa fa-search"></i></button>
+                  </span>
+                </div>
+              </div>
+            </div>
             <table class="table table-stripped">
               <thead>
                 <tr>
@@ -30,24 +40,26 @@
                   <th>Email</th>
                   <th>Address</th>
                   <th>Foto</th>
+                  <th>Action</th>
                 </tr>
               </thead>
 
               <tbody>
-                @foreach ($result as $row)
-                <tr>
-                  <td>{{ !empty($i) ? ++$i : $i = 1 }}</td>
+                @foreach ($result as $index => $row)
+                <tr class="umkm-row" data-index="{{ $index }}">
+                  {{-- <td>{{ !empty($i) ? ++$i : $i = 1 }}</td> --}}
+                  <td class="row-no"></td>
                   <td>{{ $row->umkm_name }}</td>
                   <td>{{ $row->owner_name }}</td>
                   <td>{{ $row->umkm_desc }}</td>
                   <td>{{ $row->phone }}</td>
                   <td>{{ $row->email }}</td>
                   <td>{{ $row->address }}</td>
-                  <td>{{ $row->images }}</td>
                   <td>
                     <img src="{{ asset('uploads/'.@$row->images) }}" width="80px" class="img" />
                   </td>
                   <td>
+                    <a href="{{ url("umkm/$row->id/detail") }}" class="btn btn-sm btn-primary"><i class="fa fa-search"></i></a>
                     <a href="{{ url("umkm/$row->id/edit") }}" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></a>
                     <form action="{{ url("umkm/$row->id/delete") }}" method="POST" style="display:inline;">
                       {{ csrf_field() }}
@@ -60,6 +72,13 @@
                 @endforeach
               </tbody>
             </table>
+            <div class="row">
+              <div class="col-md-12 text-right">
+                <span id="pageInfo" class="label label-default" style="margin-right: 10px;"></span>
+                <button class="btn btn-default" id="prevBtn">Previous</button>
+                <button class="btn btn-primary" id="nextBtn">Next</button>
+              </div>
+            </div>
           </div>
           <!-- /.box-body -->
           <!-- /.box-footer-->
@@ -69,3 +88,48 @@
       </section>
       <!-- /.content -->
 @endsection
+
+@push('script')
+<script>
+  $(function () {
+    const perPage = 5;
+    let page = 1;
+
+    function render() {
+      const keyword = $('#searchInput').val().toLowerCase();
+      const $rows = $('.umkm-row').hide().filter((_, el) =>
+        $(el).text().toLowerCase().includes(keyword)
+      );
+
+      const total = $rows.length;
+      const pages = Math.max(1, Math.ceil(total / perPage));
+      page = Math.min(page, pages);
+
+      $rows.slice((page - 1) * perPage, page * perPage).each((i, el) => {
+        $(el).show();
+        $(el).find('.row-no').text((page - 1) * perPage + i + 1);
+      });
+
+      $('#pageInfo').text(`Halaman ${page} dari ${pages}`);
+      $('#prevBtn').prop('disabled', page === 1);
+      $('#nextBtn').prop('disabled', page === pages);
+    }
+
+    $('#prevBtn').click(() => { page--; render(); });
+    $('#nextBtn').click(() => { page++; render(); });
+
+    // Trigger search saat tombol diklik
+    $('#searchBtn').click(() => { page = 1; render(); });
+
+    // Trigger juga saat Enter ditekan di input
+    $('#searchInput').keypress(function (e) {
+      if (e.which === 13) {
+        page = 1;
+        render();
+      }
+    });
+
+    render();
+  });
+</script>
+@endpush

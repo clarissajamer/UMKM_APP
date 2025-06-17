@@ -83,7 +83,7 @@
               <div class="form-group">
                   <label class="control-label col-sm-2">Rating</label>
                   <div class="col-sm-10">
-                      <input type="number" name="rating" class="form-control" placeholder="rating" value="{{ @$result->rating }}">
+                      <input type="number" name="rating" step="0.1" min="0" max="5" class="form-control" placeholder="rating" value="{{ @$result->rating }}">
                   </div>
               </div>
 

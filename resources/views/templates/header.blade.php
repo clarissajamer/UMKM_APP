@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ asset('assets') }}/dist/css/AdminLTE.min.css">
+  {{-- jquery --}}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
   <link rel="stylesheet" href="{{ asset('assets') }}/dist/css/skins/_all-skins.min.css">
@@ -164,4 +166,5 @@
   <div class="content-wrapper">
     @yield('content')
   </div>
+  @stack('script')
   @include('templates/footer')
