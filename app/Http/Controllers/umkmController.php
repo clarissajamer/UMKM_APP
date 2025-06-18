@@ -38,7 +38,7 @@ class umkmController extends Controller
             'phone' => 'required|digits_between:10,15',
             'email' => 'required|email|max:50|unique:umkm,email',
             'address' => 'required',
-            'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'images' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         if ($request->hasFile('images')) {
@@ -79,7 +79,7 @@ class umkmController extends Controller
                 Rule::unique('umkm', 'email')->ignore($id),
             ],
             'address' => 'required',
-            'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'images' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $umkm = \App\Models\umkm::where('id', $id)->first();

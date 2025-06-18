@@ -54,12 +54,6 @@ class KategoriController extends Controller
 
         $kategori = \App\Models\kategori::where('id', $id)->first();
 
-        if ($request->hasFile('gambar') && $request->file('gambar')->isValid()) {
-            $filename = $kategori->id_kategori . "." . $request->file('gambar')->getClientOriginalExtension();
-            $request->file('gambar')->storeAs('uploads', $filename, 'upload');
-            $validated['gambar'] = $filename;
-        }
-
         $status = $kategori->update($validated);
 
         if ($request->expectsJson()) {

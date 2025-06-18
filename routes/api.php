@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
-
 Route::apiResource('product', ProdukController::class);
 Route::apiResource('category', KategoriController::class);
 Route::apiResource('catalog', umkmController::class);
+Route::apiResource('images', umkmController::class);
 
 
 // Route::get('/api/test', function () {

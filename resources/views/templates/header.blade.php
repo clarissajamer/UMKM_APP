@@ -155,6 +155,12 @@
           </a>
         </li>
 
+        <li>
+          <a href="{{ asset('image') }}">
+            <i class="fa fa-book"></i> <span>Image</span>
+          </a>
+        </li>
+
       </ul>
     </section>
     <!-- /.sidebar -->

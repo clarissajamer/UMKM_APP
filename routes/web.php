@@ -1,15 +1,35 @@
 <?php
 
+use App\Http\Controllers\imageController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\umkmController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 
 Route::get('/', function () {
     return redirect('/produk');
 });
 
+Route::get('/api/list-uploads', function () {
+    $uploadPath = public_path('uploads');
 
+    if (!File::exists($uploadPath)) {
+        return response()->json(['error' => 'Folder uploads tidak ditemukan'], 404);
+    }
+
+    $files = File::files($uploadPath);
+    $data = [];
+
+    foreach ($files as $file) {
+        $data[] = [
+            'filename' => $file->getFilename(),
+            'url' => url('uploads/' . $file->getFilename())
+        ];
+    }
+
+    return response()->json($data);
+});
 
 // route produk
 
@@ -48,6 +68,19 @@ Route::get('umkm/{id}/edit', [umkmController::class, 'edit']);
 Route::patch('umkm/{id}/edit', [umkmController::class, 'update']);
 
 Route::delete('umkm/{id}/delete', [umkmController::class, 'destroy']);
+
+// route image
+
+Route::get('/image', [imageController::class, 'index']);
+Route::get('image/{id}/detail', [imageController::class, 'show']);
+
+Route::get('image/add', [imageController::class, 'create']);
+Route::post('image', [imageController::class, 'store']);
+
+Route::get('image/{id}/edit', [imageController::class, 'edit']);
+Route::patch('image/{id}/edit', [imageController::class, 'update']);
+
+Route::delete('image/{id}/delete', [imageController::class, 'destroy']);
 
 // Route::get('/api/test', function () {
 //     return response()->json(['status' => 'API OK']);

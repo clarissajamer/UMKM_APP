@@ -43,7 +43,7 @@ class ProdukController extends Controller
             'rating' => 'required|numeric|between:0,5',
             'price' => 'required|numeric',
             'description' => 'required ',
-            'images' => 'required|mimes:jpeg,png|max:2048',
+            'images' => 'required|mimes:jpeg,png,webp ,svg,jpg|max:2048',
         ]);
 
         if ($request->hasFile('images')) {
@@ -79,7 +79,7 @@ class ProdukController extends Controller
             'rating' => 'required|numeric|between:0,5',
             'price' => 'required|numeric',
             'description' => 'required|Max:255',
-            'images' => 'required|mimes:jpeg,png|max:2048',
+            'images' => 'required|mimes:jpeg,png,webp|max:2048',
         ]);  
 
         $produk = \App\Models\produk::where('id', $id)->first();
