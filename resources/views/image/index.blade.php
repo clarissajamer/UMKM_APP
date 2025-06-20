@@ -4,7 +4,7 @@
  <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-          Images
+          image
         </h1>
         <ol class="breadcrumb">
           <li><a href="{{ url('/image') }}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -23,7 +23,8 @@
               <thead>
                 <tr>
                   <th>NO</th>
-                  <th>image</th>
+                  <th>Nama</th>
+                  <th>Foto</th>
                 </tr>
               </thead>
 
@@ -31,7 +32,10 @@
                 @foreach ($result as $row)
                 <tr>
                   <td>{{ !empty($i) ? ++$i : $i = 1 }}</td>
-                  <td>{{ $row->images }}</td>
+                  <td>{{ $row->nama }}</td>
+                  <td>
+                    <img src="{{ asset('uploads/'.@$row->images) }}" width="80px" class="img" />
+                  </td>
                   <td>
                     <a href="{{ url("image/$row->id/edit") }}" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></a>
                     <form action="{{ url("image/$row->id/delete") }}" method="POST" style="display:inline;">

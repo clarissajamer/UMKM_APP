@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\imageController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\umkmController;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('product', ProdukController::class);
 Route::apiResource('category', KategoriController::class);
 Route::apiResource('catalog', umkmController::class);
-Route::apiResource('images', umkmController::class);
+Route::apiResource('images', imageController::class);
 
 
 // Route::get('/api/test', function () {

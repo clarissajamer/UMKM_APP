@@ -11,26 +11,6 @@ Route::get('/', function () {
     return redirect('/produk');
 });
 
-Route::get('/api/list-uploads', function () {
-    $uploadPath = public_path('uploads');
-
-    if (!File::exists($uploadPath)) {
-        return response()->json(['error' => 'Folder uploads tidak ditemukan'], 404);
-    }
-
-    $files = File::files($uploadPath);
-    $data = [];
-
-    foreach ($files as $file) {
-        $data[] = [
-            'filename' => $file->getFilename(),
-            'url' => url('uploads/' . $file->getFilename())
-        ];
-    }
-
-    return response()->json($data);
-});
-
 // route produk
 
 Route::get('/produk', [ProdukController::class, 'index']);

@@ -9,9 +9,9 @@ class image extends Model
 {
     use HasFactory;
 
-    protected $table = 'image';
+    protected $table = 'images';
 
     protected $fillable = [
-        'images'
+        'nama', 'images'
     ];
 }

@@ -26,7 +26,11 @@ class KategoriController extends Controller
 
     public function store(Request $request) {
         $validated = $request->validate([
-            'category' => 'required|Max:100',
+            'category' => [
+                'required',
+                'max:100',
+                'regex:/^[a-zA-Z0-9\s\-]+$/'
+            ],
         ]);
 
         $status = \App\Models\kategori::create($validated);
@@ -49,7 +53,11 @@ class KategoriController extends Controller
     
     public function update(Request $request, $id) {
         $validated = $request->validate([
-            'category' => 'required|Max:100',
+            'category' => [
+                'required',
+                'max:100',
+                'regex:/^[a-zA-Z0-9\s\-]+$/'
+            ],
         ]);
 
         $kategori = \App\Models\kategori::where('id', $id)->first();
@@ -81,54 +89,4 @@ class KategoriController extends Controller
         if($status) return redirect('kategori')->with('success', 'Data Berhasil dihapus');
         else return redirect('kategori')->with('error', 'Data Gagal dihapus');
     }
-
-    // Alur online first
-
-    // public function index()
-    // {
-    //     $data = kategori::get();
-    //     return response()->json($data);
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $data = kategori::create($request->all());
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Data Berhasil Ditambahkan',
-    //         'data' => $data
-    //     ]);
-    // }
-
-    // public function show(string $id)
-    // {
-    //     $data = kategori::find($id);
-    //     return response()->json([
-    //         'status' => true,
-    //         'data' => $data
-    //     ], 200);
-    // }
-    
-    // public function update(Request $request, string $id)
-    // {
-    //     $data = kategori::find($id);
-    //     $data->update($request->all());
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Update berhasil',
-    //         'data' => $data
-    //     ], 200);
-    // }
-
-    // public function destroy(string $id)
-    // {
-    //     $data = kategori::find($id);
-    //     $data->delete();
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Update berhasil',
-    //     ], 200);
-    // }
-
 }

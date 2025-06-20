@@ -4,12 +4,12 @@
    <!-- Content Header (Page header) -->
     <section class="content-header">
         <h1>
-          {{ empty($result) ? 'Tambah' : 'Edit' }} Images
+          {{ empty($result) ? 'Tambah' : 'Edit' }} image UMKM
         </h1>
         <ol class="breadcrumb">
           <li><a href="{{ url('image') }}"><i class="fa fa-dashboard"></i> Home</a></li>
-          <li>Images</li>
-          <li class="active">{{ empty($result) ? 'Tambah' : 'Edit' }} Images</li>
+          <li>image UMKM</li>
+          <li class="active">{{ empty($result) ? 'Tambah' : 'Edit' }} image UMKM</li>
         </ol>
       </section>
   
@@ -43,11 +43,23 @@
                   @method('PATCH')
               @endif
 
-              {{-- image --}}
+              {{-- Nama --}}
               <div class="form-group">
-                  <label class="control-label col-sm-2">Image</label>
+                  <label class="control-label col-sm-2">Nama</label>
                   <div class="col-sm-10">
-                      <input type="text" name="images" class="form-control" placeholder="images" value="{{ @$result->images }}">
+                      <input type="text" name="nama" class="form-control" placeholder="nama" value="{{ @$result->nama }}">
+                  </div>
+              </div>
+
+              {{-- Foto --}}
+              <div class="form-group">
+                  <label class="control-label col-sm-2">Foto</label>
+                  <div class="col-sm-10">
+                      <input type="file" name="images" />
+                      @if (!empty($result->images))
+                          <br>
+                          <img src="{{ asset('uploads/' . $result->images) }}" width="100" />
+                      @endif
                   </div>
               </div>
 

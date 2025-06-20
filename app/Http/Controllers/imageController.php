@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\image;
 use Illuminate\Http\Request;
 
 class imageController extends Controller
@@ -18,20 +19,32 @@ class imageController extends Controller
     }
     
     public function create() {
-        return view('image.form');
+        return view('image.form');  
     }   
 
     public function store(Request $request) {
         $validated = $request->validate([
-            'images' => 'required|url',
+            'nama' => [
+                'required',
+                'max:100',
+                'regex:/^[a-zA-Z0-9\s\-]+$/'
+            ],
+            'images' => 'required|mimes:jpeg,png,webp,svg,jpg|max:2048',
         ]);
+
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $validated['images'] = $filename;
+        }
 
         $status = \App\Models\image::create($validated);
 
         if ($request->expectsJson()) {
             return response()->json([
                 'status' => $status ? true : false,
-                'message' => $status ? 'Update berhasil' : 'Update gagal',
+                'message' => $status ? 'Berhasil ditambah' : 'Gagal ditambah',
             ], $status ? 200 : 500);
         }
 
@@ -46,10 +59,22 @@ class imageController extends Controller
     
     public function update(Request $request, $id) {
         $validated = $request->validate([
-            'images' => 'required|url',
-        ]);
+            'nama' => [
+                'required',
+                'max:100',
+                'regex:/^[a-zA-Z0-9\s\-]+$/'
+            ],
+            'images' => 'required|mimes:jpeg,png,webp,svg,jpg|max:2048',
+        ]);  
 
         $image = \App\Models\image::where('id', $id)->first();
+
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $validated['images'] = $filename;
+        }
 
         $status = $image->update($validated);
 

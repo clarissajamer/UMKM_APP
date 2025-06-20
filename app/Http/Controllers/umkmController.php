@@ -32,12 +32,12 @@ class umkmController extends Controller
 
     public function store(Request $request) {
         $validated = $request->validate([
-            'umkm_name' => 'required|max:100',
-            'owner_name' => 'required|max:100',
-            'umkm_desc' => 'required',
-            'phone' => 'required|digits_between:10,15',
+            'umkm_name' => ['required', 'max:100', 'regex:/^[a-zA-Z0-9\s\-]+$/'],
+            'owner_name' => ['required', 'max:100', 'regex:/^[a-zA-Z\s]+$/'],
+            'umkm_desc' => ['required', 'regex:/^[a-zA-Z0-9\s.,\-]+$/'],
+            'phone' => ['required', 'digits_between:10,15', 'regex:/^[0-9]+$/'],
             'email' => 'required|email|max:50|unique:umkm,email',
-            'address' => 'required',
+            'address' => ['required', 'regex:/^[a-zA-Z0-9\s.,\-]+$/'],
             'images' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -68,17 +68,17 @@ class umkmController extends Controller
     
     public function update(Request $request, $id) {
         $validated = $request->validate([
-            'umkm_name' => 'required|max:100',
-            'owner_name' => 'required|max:100',
-            'umkm_desc' => 'required',
-            'phone' => 'required|digits_between:10,15',
+            'umkm_name' => ['required', 'max:100', 'regex:/^[a-zA-Z0-9\s\-]+$/'],
+            'owner_name' => ['required', 'max:100', 'regex:/^[a-zA-Z\s]+$/'],
+            'umkm_desc' => ['required', 'regex:/^[a-zA-Z0-9\s.,\-]+$/'],
+            'phone' => ['required', 'digits_between:10,15', 'regex:/^[0-9]+$/'],
             'email' => [
                 'required',
                 'email',
                 'max:50',
                 Rule::unique('umkm', 'email')->ignore($id),
             ],
-            'address' => 'required',
+            'address' => ['required', 'regex:/^[a-zA-Z0-9\s.,\-]+$/'],
             'images' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -118,118 +118,4 @@ class umkmController extends Controller
         if($status) return redirect('umkm')->with('success', 'Data Berhasil dihapus');
         else return redirect('umkm')->with('error', 'Data Gagal dihapus');
     }
-
-    // alur online first
-
-    // public function index()
-    // {
-    //     $data = umkm::get();
-    //     return response()->json($data);
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'umkm_name' => 'required|max:100',
-    //         'owner_name' => 'required|max:100',
-    //         'umkm_desc' => 'required|max:255',
-    //         'phone' => 'required|digits_between:10,15',
-    //         'email' => 'required|email|max:50|unique:umkm,email',
-    //         'address' => 'required|max:255',
-    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    //     ]);
-
-    //     if ($request->hasFile('images')) {
-    //         $file = $request->file('images');
-    //         $filename = time() . '_' . $file->getClientOriginalName();
-    //         $file->move(public_path('uploads'), $filename); // simpan di public/uploads
-    //         $validated['images'] = 'uploads/' . $filename;  // simpan path relatif
-    //     }
-
-    //     $data = umkm::create($validated);
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Data Berhasil Ditambahkan',
-    //         'data' => $data
-    //     ]);
-    // }
-
-    // public function show(string $id)
-    // {
-    //     $data = umkm::find($id);
-    //     if (!$data) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'umkm tidak ditemukan',
-    //         ], 404);
-    //     }
-    //     return response()->json([
-    //         'status' => true,
-    //         'data' => $data
-    //     ], 200);
-    // }
-    
-    // public function update(Request $request, string $id)
-    // {
-    //     $data = umkm::findOrFail($id);
-
-    //     $validated = $request->validate([
-    //         'umkm_name' => 'required|max:100',
-    //         'owner_name' => 'required|max:100',
-    //         'umkm_desc' => 'required|max:255',
-    //         'phone' => 'required|digits_between:10,15',
-    //         'email' => [
-    //             'required',
-    //             'email',
-    //             'max:50',
-    //             Rule::unique('umkm', 'email')->ignore($id),
-    //         ],
-    //         'address' => 'required|max:255',
-    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    //     ]);
-
-    //     if ($request->hasFile('images')) {
-    //         // Hapus images lama jika ada
-    //         if ($data->images && file_exists(public_path($data->images))) {
-    //             unlink(public_path($data->images));
-    //         }
-
-    //         $file = $request->file('images');
-    //         $filename = time() . '_' . $file->getClientOriginalName();
-    //         $file->move(public_path('uploads'), $filename);
-    //         $validated['images'] = 'uploads/' . $filename;
-    //     }
-
-    //     $data->update($validated);
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Update berhasil',
-    //         'data' => $data
-    //     ], 200);
-    // }
-
-    // public function destroy(string $id)
-    // {
-    //     $data = umkm::find($id);
-    //     if (!$data) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'umkm tidak ditemukan',
-    //         ], 404);
-    //     }
-
-    //     // Hapus file gambar
-    //     if ($data->images && file_exists(public_path($data->images))) {
-    //         unlink(public_path($data->images));
-    //     }
-
-    //     $data->delete();
-
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Update berhasil',
-    //     ], 200);
-    // }
 }

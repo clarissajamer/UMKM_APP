@@ -39,10 +39,20 @@ class ProdukController extends Controller
         $validated = $request->validate([
             'id_kategori' => 'required|exists:kategori,id',
             'id_umkm' => 'required|exists:umkm,id',
-            'title' => 'required|Max:100',
+            'title' => [
+                'required',
+                'max:100',
+                'regex:/^[a-zA-Z0-9\s\-]+$/'
+            ],
             'rating' => 'required|numeric|between:0,5',
-            'price' => 'required|numeric',
-            'description' => 'required ',
+            'price' => [
+                'required',
+                'regex:/^\d+$/'
+            ],
+            'description' => [
+                'required',
+                'regex:/^[a-zA-Z0-9\s.,\-]+$/'
+            ],
             'images' => 'required|mimes:jpeg,png,webp ,svg,jpg|max:2048',
         ]);
 
@@ -75,11 +85,21 @@ class ProdukController extends Controller
         $validated = $request->validate([
             'id_kategori' => 'required|exists:kategori,id',
             'id_umkm' => 'required|exists:umkm,id',
-            'title' => 'required|Max:100',
+            'title' => [
+                'required',
+                'max:100',
+                'regex:/^[a-zA-Z0-9\s\-]+$/'
+            ],
             'rating' => 'required|numeric|between:0,5',
-            'price' => 'required|numeric',
-            'description' => 'required|Max:255',
-            'images' => 'required|mimes:jpeg,png,webp|max:2048',
+            'price' => [
+                'required',
+                'regex:/^\d+$/'
+            ],
+            'description' => [
+                'required',
+                'regex:/^[a-zA-Z0-9\s.,\-]+$/'
+            ],
+            'images' => 'required|mimes:jpeg,png,webp ,svg,jpg|max:2048',
         ]);  
 
         $produk = \App\Models\produk::where('id', $id)->first();
